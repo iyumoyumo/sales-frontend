@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import API_BASE_URL from "../api";   // ← 追加（重要）
 
 export default function EmployeeList() {
   const [employees, setEmployees] = useState([]);
@@ -8,7 +9,7 @@ export default function EmployeeList() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8000/api/employees")
+      .get(`${API_BASE_URL}/api/employees`)   // ← ここだけ変更
       .then((res) => setEmployees(res.data))
       .catch((err) => console.error("社員取得エラー:", err));
   }, []);
