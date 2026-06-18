@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
+import API_BASE_URL from "../api";   // ← 追加（重要）
 
 export default function PersonalSummary() {
   const [sales, setSales] = useState([]);
   const [employees, setEmployees] = useState([]);
-  const [selected, setSelected] = useState(""); // ← 社員番号を入れる
+  const [selected, setSelected] = useState("");
   const [mode, setMode] = useState("month");
 
   // 売上データ取得
   useEffect(() => {
-    fetch("http://localhost:8000/api/sales")
+    fetch(`${API_BASE_URL}/api/sales`)   // ← ここを変更
       .then((res) => res.json())
       .then((data) => setSales(data))
       .catch((err) => console.error("APIエラー:", err));
@@ -16,13 +17,12 @@ export default function PersonalSummary() {
 
   // 社員データ取得
   useEffect(() => {
-    fetch("http://localhost:8000/api/employees")
+    fetch(`${API_BASE_URL}/api/employees`)  // ← ここも変更
       .then((res) => res.json())
       .then((data) => setEmployees(data))
       .catch((err) => console.error("社員APIエラー:", err));
   }, []);
 
-  // ★ 社員番号 → 社員名
   const getEmployeeName = (employee_id) => {
     const emp = employees.find((e) => e.employee_id === employee_id);
     return emp ? emp.name : "";
@@ -49,10 +49,8 @@ export default function PersonalSummary() {
     return `${year}年${month}月 第${weekNumber}週`;
   };
 
-  // ★ 選択された社員番号の売上だけ抽出
   const filtered = sales.filter((s) => s.employee_id === selected);
 
-  // ★ 集計処理
   const grouped = {};
   filtered.forEach((s) => {
     const key =
@@ -72,7 +70,6 @@ export default function PersonalSummary() {
     <div className="bg-white p-6 rounded shadow w-full">
       <h2 className="text-2xl font-bold mb-4">売上集計（個人別）</h2>
 
-      {/* 社員選択（社員番号を value にする） */}
       <select
         className="border p-2 mb-4"
         value={selected}
@@ -88,7 +85,6 @@ export default function PersonalSummary() {
 
       {selected && (
         <>
-          {/* 週・月・年 切り替え */}
           <div className="flex space-x-3 mb-4">
             <button
               className={`px-4 py-2 rounded ${
@@ -118,7 +114,6 @@ export default function PersonalSummary() {
             </button>
           </div>
 
-          {/* 集計テーブル */}
           <table className="w-full border-collapse">
             <thead>
               <tr className="bg-gray-200">
