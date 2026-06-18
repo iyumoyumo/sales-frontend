@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
-import API_BASE_URL from "../api";   // ← 追加（重要）
+import API_BASE_URL from "../api";
+
 
 export default function EmployeeForm() {
   const [form, setForm] = useState({
