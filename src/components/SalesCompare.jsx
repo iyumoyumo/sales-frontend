@@ -10,15 +10,17 @@ import {
   Legend,
 } from "chart.js";
 
+import API_BASE_URL from "../api";   // ← 追加（重要）
+
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 export default function SalesCompare() {
   const [sales, setSales] = useState([]);
-  const [mode, setMode] = useState("month"); // week | month | year
+  const [mode, setMode] = useState("month");
 
   // ★ DB から売上データを取得
   useEffect(() => {
-    fetch("http://localhost:8000/api/sales")
+    fetch(`${API_BASE_URL}/api/sales`)   // ← ここを変更
       .then((res) => res.json())
       .then((data) => setSales(data))
       .catch((err) => console.error("APIエラー:", err));
@@ -66,7 +68,6 @@ export default function SalesCompare() {
     return da - db;
   });
 
-  // ★ グラフ用データ
   const chartData = {
     labels: summary.map(([period]) => period),
     datasets: [
@@ -82,7 +83,6 @@ export default function SalesCompare() {
     <div className="bg-white p-6 rounded shadow w-full">
       <h2 className="text-2xl font-bold mb-4">売上比較</h2>
 
-      {/* 切り替え */}
       <div className="flex space-x-3 mb-4">
         <button
           className={`px-4 py-2 rounded ${
@@ -112,7 +112,6 @@ export default function SalesCompare() {
         </button>
       </div>
 
-      {/* 比較テーブル */}
       <table className="w-full border-collapse mb-6">
         <thead>
           <tr className="bg-gray-200">
@@ -130,7 +129,6 @@ export default function SalesCompare() {
         </tbody>
       </table>
 
-      {/* グラフ */}
       <div className="h-80">
         <Bar data={chartData} />
       </div>
