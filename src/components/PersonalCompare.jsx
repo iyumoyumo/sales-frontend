@@ -10,21 +10,23 @@ import {
   Legend,
 } from "chart.js";
 
+import API_BASE_URL from "../api";   // ← 追加（重要）
+
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
 
 export default function PersonalCompare() {
   const [sales, setSales] = useState([]);
   const [employees, setEmployees] = useState([]);
-  const [selected, setSelected] = useState(""); // ← 社員番号が入る
+  const [selected, setSelected] = useState("");
   const [mode, setMode] = useState("month");
 
   // DB から sales と employees を取得
   useEffect(() => {
-    fetch("http://localhost:8000/api/sales")
+    fetch(`${API_BASE_URL}/api/sales`)     // ← ここを変更
       .then((res) => res.json())
       .then((data) => setSales(data));
 
-    fetch("http://localhost:8000/api/employees")
+    fetch(`${API_BASE_URL}/api/employees`) // ← ここも変更
       .then((res) => res.json())
       .then((data) => setEmployees(data));
   }, []);
@@ -49,10 +51,8 @@ export default function PersonalCompare() {
     return `${year}年${month}月 第${weekNumber}週`;
   };
 
-  // 🔥 選択された社員番号の売上だけ抽出
   const filtered = sales.filter((s) => s.employee_id === selected);
 
-  // 🔥 週・月・年で集計
   const grouped = {};
   filtered.forEach((s) => {
     const key =
@@ -69,7 +69,6 @@ export default function PersonalCompare() {
   const labels = Object.keys(grouped);
   const values = Object.values(grouped);
 
-  // 選択中の社員名を取得
   const selectedEmployee = employees.find((e) => e.employee_id === selected);
 
   const chartData = {
@@ -89,7 +88,6 @@ export default function PersonalCompare() {
     <div className="bg-white p-6 rounded shadow w-full">
       <h2 className="text-2xl font-bold mb-4">売上比較（個人別）</h2>
 
-      {/* 🔥 社員番号を value にする */}
       <select
         className="border p-2 mb-4"
         value={selected}
