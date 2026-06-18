@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import API_BASE_URL from "../api";   // ← 追加（重要）
 
 export default function SalesForm({ setScreen }) {
   const [employees, setEmployees] = useState([]);
@@ -11,7 +12,7 @@ export default function SalesForm({ setScreen }) {
 
   // 社員一覧を取得
   useEffect(() => {
-    fetch("http://localhost:8000/api/employees")
+    fetch(`${API_BASE_URL}/api/employees`)   // ← ここを変更
       .then(res => res.json())
       .then(data => setEmployees(data));
   }, []);
@@ -23,13 +24,13 @@ export default function SalesForm({ setScreen }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await fetch("http://localhost:8000/api/sales", {
+    await fetch(`${API_BASE_URL}/api/sales`, {   // ← ここも変更
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
 
-    setScreen("salesList"); // ← Router なしで画面遷移
+    setScreen("salesList");
   };
 
   return (
