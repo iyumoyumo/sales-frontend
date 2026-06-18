@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../api";   // ← 追加（重要）
 
 export default function SalesSummary() {
   const [employees, setEmployees] = useState([]);
@@ -9,28 +10,26 @@ export default function SalesSummary() {
   const [mode, setMode] = useState("week");
 
   const now = new Date();
-  //const [yearSelect, setYearSelect] = useState(now.getFullYear());
-  //const [monthSelect, setMonthSelect] = useState(now.getMonth() + 1);
-  //const [weekSelect, setWeekSelect] = useState(1);
 
-const [yearSelect, setYearSelect] = useState(null);
-const [monthSelect, setMonthSelect] = useState(null);
-const [weekSelect, setWeekSelect] = useState(null);
+  const [yearSelect, setYearSelect] = useState(null);
+  const [monthSelect, setMonthSelect] = useState(null);
+  const [weekSelect, setWeekSelect] = useState(null);
 
   const navigate = useNavigate();
 
   // 社員一覧
   useEffect(() => {
-    axios.get("http://localhost:8000/api/employees")
+    axios.get(`${API_BASE_URL}/api/employees`)   // ← ここを変更
       .then((res) => setEmployees(res.data));
   }, []);
 
   // 売上一覧
-  //useEffect(() => {
-    //axios.get("http://localhost:8000/api/sales")
-      //.then((res) => setSales(res.data));
-  //}, []);
-
+  useEffect(() => {
+    axios.get(`${API_BASE_URL}/api/sales`)       // ← ここも変更
+      .then((res) => {
+        setSales(res.data);
+      });
+  }, []);
 
   // ISO週番号
   const getWeek = (d) => {
@@ -49,27 +48,18 @@ const [weekSelect, setWeekSelect] = useState(null);
     );
   };
 
- // 売上一覧（sales を取得）
-useEffect(() => {
-  axios.get("http://localhost:8000/api/sales")
-    .then((res) => {
-      setSales(res.data);
-    });
-}, []);
+  // sales が入ったら初期値セット
+  useEffect(() => {
+    if (sales.length > 0) {
+      const years = [...new Set(sales.map(s => new Date(s.sale_date).getFullYear()))];
+      setYearSelect(years[0]);
 
-// sales が入ったら初期値セット
-useEffect(() => {
-  if (sales.length > 0) {
-    const years = [...new Set(sales.map(s => new Date(s.sale_date).getFullYear()))];
-    setYearSelect(years[0]);
+      const firstDate = new Date(sales[0].sale_date);
+      setMonthSelect(firstDate.getMonth() + 1);
+      setWeekSelect(getWeek(firstDate));
+    }
+  }, [sales]);
 
-    const firstDate = new Date(sales[0].sale_date);
-    setMonthSelect(firstDate.getMonth() + 1);
-    setWeekSelect(getWeek(firstDate));
-  }
-}, [sales]);
-
- 
   // 個人別の期間売上（社員番号で集計）
   const personalTotals = (() => {
     const totals = {};
@@ -77,7 +67,7 @@ useEffect(() => {
 
     sales.forEach((s) => {
       const date = new Date(s.sale_date);
-      const empId = s.employee_id; // ← 社員番号
+      const empId = s.employee_id;
 
       let match = false;
 
@@ -103,7 +93,6 @@ useEffect(() => {
     return totals;
   })();
 
-  // 売上がある社員だけ抽出（社員番号で判定）
   const employeesWithTotals = employees.filter(
     (emp) => personalTotals[emp.employee_id] > 0
   );
