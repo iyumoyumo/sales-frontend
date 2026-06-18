@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import API_BASE_URL from "../api";   // ← 追加（重要）
 
 export default function SalesSummary() {
   const [sales, setSales] = useState([]);
@@ -6,7 +7,7 @@ export default function SalesSummary() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const salesRes = await fetch("http://localhost:8000/api/sales");
+      const salesRes = await fetch(`${API_BASE_URL}/api/sales`);  // ← ここを変更
       setSales(await salesRes.json());
     };
     fetchData();
