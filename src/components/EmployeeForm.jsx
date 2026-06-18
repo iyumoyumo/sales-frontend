@@ -1,9 +1,10 @@
 import axios from "axios";
 import { useState } from "react";
+import API_BASE_URL from "../api";   // ← 追加（重要）
 
 export default function EmployeeForm() {
   const [form, setForm] = useState({
-    employeeId: "",   // ← 追加
+    employeeId: "",
     name: "",
     email: "",
     department: "",
@@ -13,25 +14,25 @@ export default function EmployeeForm() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    //alert("登録データ: " + JSON.stringify(form));
-    try{
-  const res = await axios.post("http://localhost:8000/api/employees", form);
+    try {
+      const res = await axios.post(
+        `${API_BASE_URL}/api/employees`,   // ← ここだけ変更
+        form
+      );
       alert("登録成功: " + JSON.stringify(res.data));
     } catch (error) {
       console.error(error);
       alert("登録エラー");
     }
   };
-  
+
   return (
     <div className="bg-white p-6 rounded shadow w-full max-w-lg">
       <h2 className="text-2xl font-bold mb-4">社員登録</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-
-        {/* 社員ID */}
         <div>
           <label className="block font-semibold mb-1">社員ID</label>
           <input
@@ -44,7 +45,6 @@ export default function EmployeeForm() {
           />
         </div>
 
-        {/* 名前 */}
         <div>
           <label className="block font-semibold mb-1">名前</label>
           <input
@@ -57,7 +57,6 @@ export default function EmployeeForm() {
           />
         </div>
 
-        {/* メール */}
         <div>
           <label className="block font-semibold mb-1">メール</label>
           <input
@@ -70,7 +69,6 @@ export default function EmployeeForm() {
           />
         </div>
 
-        {/* 部署 */}
         <div>
           <label className="block font-semibold mb-1">部署</label>
           <input
